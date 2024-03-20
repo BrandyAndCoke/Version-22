@@ -1,0 +1,59 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+
+# Function to open a new browser window
+def open_new_window(driver):
+    driver.execute_script("window.open('about:blank', '_blank');")
+
+# Function to resize the browser window
+def resize_window(driver, width, height):
+    driver.set_window_size(width, height)
+
+# URLs to open in each tab
+urls = [
+    "https://intl.fusionsolar.huawei.com/pvmswebsite/nologin/assets/build/cloud.html#/kiosk?kk=r4Evb1INiy8KKQIrIDDgd6lJb5uMhM39",
+    "https://intl.fusionsolar.huawei.com/pvmswebsite/nologin/assets/build/cloud.html#/kiosk?kk=Dsis12ifMjHeA9LHzQroL3qv5xlNzmji",
+    "https://intl.fusionsolar.huawei.com/pvmswebsite/nologin/assets/build/cloud.html#/kiosk?kk=Hs4ayed382B7lfMs7Aawn6s8m7B9Iw3t",
+    "https://intl.fusionsolar.huawei.com/pvmswebsite/nologin/assets/build/cloud.html#/kiosk?kk=JEQ4wb6rNxofzb7uBQOhfj5gCsuoaL6M",
+    "https://intl.fusionsolar.huawei.com/pvmswebsite/nologin/assets/build/cloud.html#/kiosk?kk=JgamKw8LimCPpyhfsEe7eFzKavEnQxo7"
+]
+
+# Create a WebDriver instance (you need to have the appropriate browser driver installed)
+driver = webdriver.Chrome()
+
+# Open the first browser window
+driver.get("about:blank")
+resize_window(driver, 800, 600)
+
+# Open additional windows and load URLs
+for i, url in enumerate(urls):
+    open_new_window(driver)
+    handles = driver.window_handles
+    driver.switch_to.window(handles[-1])
+    driver.get(url)
+    resize_window(driver, 800, 600)
+
+# Move and resize the windows to fit the screen
+window_width = 800
+window_height = 600
+screen_width = driver.execute_script("return window.screen.availWidth")
+screen_height = driver.execute_script("return window.screen.availHeight")
+
+x_offset = 0
+y_offset = 0
+for handle in driver.window_handles:
+    driver.switch_to.window(handle)
+    driver.set_window_position(x_offset, y_offset)
+    x_offset += window_width
+    if x_offset + window_width > screen_width:
+        x_offset = 0
+        y_offset += window_height
+
+# Wait for some time to see the result
+time.sleep(5)
+
+# Close the WebDriver instance
+driver.quit()
